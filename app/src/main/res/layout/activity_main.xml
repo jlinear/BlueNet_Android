@@ -6,10 +6,10 @@
     android:layout_height="match_parent"
     tools:context="com.example.marco.bluenet_01.MainActivity">
 
-    <TextView
+    <!--<TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="BlueNet v0.1"
+        android:text="BlueNet Dispatch"
         android:textSize="50sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -50,5 +50,98 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.3" />
+    -->
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="@color/white">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="80dp">
+        <!-- empty for space at top -->
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Dispatch"
+            android:textSize="75sp"
+            android:textColor="@color/black"
+            android:gravity="center"/>
+    </LinearLayout>
+
+    <ImageView
+        android:layout_width="130dp"
+        android:layout_height="130dp"
+        android:src="@drawable/bluenet_icon"
+        android:scaleType="fitCenter"
+        android:layout_gravity="center"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Powered By BlueNet"
+            android:textSize="25sp"
+            android:gravity="center"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="80dp">
+        <!-- empty for space in middle -->
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_weight="0"
+        android:gravity="center|bottom"
+        android:orientation="horizontal">
+        <LinearLayout
+            android:layout_width="20dp"
+            android:layout_height="match_parent">
+            <!-- take up space -->
+        </LinearLayout>
+        <EditText
+            android:id="@+id/usernameText"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:maxLines="1"
+            android:imeOptions="actionSend"
+            android:inputType="text"
+            android:hint="Enter Username"
+            />
+        <Button
+            android:id="@+id/loginButton"
+            android:onClick="loginClick"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="0"
+            android:text="Login"/>
+        <LinearLayout
+            android:layout_width="20dp"
+            android:layout_height="match_parent">
+            <!-- take up space -->
+        </LinearLayout>
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="Notre Dame Mobile Computing Lab, 2018"
+        android:gravity="bottom|center"/>
+
+    </LinearLayout>
 </android.support.constraint.ConstraintLayout>

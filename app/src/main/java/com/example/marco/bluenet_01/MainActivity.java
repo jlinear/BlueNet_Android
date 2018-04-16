@@ -22,13 +22,13 @@ public class MainActivity extends Activity {
     // TODO: Put messages into a database, do chat view
     // TODO: Make sidebar in map view to display closest users
 
-    // Globals
+    /*// Globals
     TextView nameView;
     SharedPreferences bluetoothInfo;
     String originalBluetoothName;
 
     public void chatClick(View view){
-        Intent i = new Intent(MainActivity.this, Chat.class);
+        Intent i = new Intent(MainActivity.this, Chat2Activity.class);
         startActivity(i);
     }
 
@@ -39,7 +39,7 @@ public class MainActivity extends Activity {
 
     // saves original bluetooth name the first time app runs
     private void setSharedPreferences(){
-        nameView = findViewById(R.id.savedBluetoothName);
+        //nameView = findViewById(R.id.savedBluetoothName);
         bluetoothInfo = this.getSharedPreferences(BuildConfig.APPLICATION_ID, Context.MODE_PRIVATE);
         if(bluetoothInfo.getString("originalName", "").isEmpty()){
             try {
@@ -92,7 +92,7 @@ public class MainActivity extends Activity {
             showToast("Bluetooth Failed");
         }
     }
-
+    */
     private void showToast(String s){
         Toast.makeText(this, s, Toast.LENGTH_SHORT).show();
     }
@@ -102,12 +102,18 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        checkPermissions();
-        enableBluetooth();
+        //checkPermissions();
+        //enableBluetooth();
 
-        setSharedPreferences();
-        originalBluetoothName = bluetoothInfo.getString("originalName", "");
+        //setSharedPreferences();
+        //originalBluetoothName = bluetoothInfo.getString("originalName", "");
 
     }
 
+    public void loginClick(View view) {
+        Intent i = new Intent(MainActivity.this, navigationActivity.class);
+        i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(i);
+        finish();
+    }
 }
