@@ -1,19 +1,30 @@
 package com.example.marco.bluenet_01;
 
 import android.content.Context;
-import android.net.Uri;
+import android.location.Location;
 import android.os.Bundle;
+import android.os.Looper;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.widget.Toast;
 
-import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapFragment;
-import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
+import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
 
 
 /**
@@ -24,7 +35,7 @@ import com.google.android.gms.maps.SupportMapFragment;
  * Use the {@link mapsFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class mapsFragment extends Fragment implements onMapReadyCallback{
+public class mapsFragment extends Fragment implements OnMapReadyCallback {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -35,6 +46,11 @@ public class mapsFragment extends Fragment implements onMapReadyCallback{
     private String mParam2;
 
     private OnFragmentInteractionListener mListener;
+    FusedLocationProviderClient mFusedLocationProviderClient;
+    Location lastLocation;
+    LocationRequest mLocationRequest;
+    boolean locationFound = false;
+    SupportMapFragment mapFragment;
 
     public mapsFragment() {
         // Required empty public constructor
@@ -67,16 +83,10 @@ public class mapsFragment extends Fragment implements onMapReadyCallback{
         }
     }
 
-
-
-    private GoogleMap googleMap;
-    MapView mapView;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        //return inflater.inflate(R.layout.fragment_maps, container, false);
-
         View view = inflater.inflate(R.layout.fragment_maps, container, false);
 
         // NOTE : We are calling the onFragmentInteraction() declared in the MainActivity
@@ -85,21 +95,32 @@ public class mapsFragment extends Fragment implements onMapReadyCallback{
             mListener.onFragmentInteraction("Dispatch Maps");
         }
 
+        mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
+        if(mapFragment == null){
+            FragmentManager fm = getFragmentManager();
+            FragmentTransaction ft = fm.beginTransaction();
+            mapFragment = SupportMapFragment.newInstance();
+            ft.replace(R.id.map, mapFragment).commit();
+        }
+
+        mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getActivity());
+
+        mapFragment.getMapAsync(this);
+
+        getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
+
         // Here we will can create click listners etc for all the gui elements on the fragment.
         // For eg: Button btn1= (Button) view.findViewById(R.id.frag1_btn1);
         // btn1.setOnclickListener(...
 
-        mapView = (MapView) view.findViewById(R.id.map); //TODO: this
+        try {
+            MapsInitializer.initialize(getActivity().getApplicationContext());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         return view;
     }
-
-    // TODO: Rename method, update argument and hook method into UI event
-    /*public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
-    }*/
 
     @Override
     public void onAttach(Context context) {
@@ -116,8 +137,62 @@ public class mapsFragment extends Fragment implements onMapReadyCallback{
     public void onDetach() {
         super.onDetach();
         mListener = null;
+
+        //stop location updates when Activity is no longer active
+        if (mFusedLocationProviderClient != null) {
+            mFusedLocationProviderClient.removeLocationUpdates(mLocationCallback);
+        }
     }
 
+    LocationCallback mLocationCallback = new LocationCallback(){
+        @Override
+        public void onLocationResult(LocationResult locationResult) {
+            for (Location location : locationResult.getLocations()) {
+                Log.i("MapsActivity", "Location: " + location.getLatitude() + " " + location.getLongitude());
+                lastLocation = location;
+
+                // makes sure location is updated in the beginning
+                if(!locationFound){
+                    updateLocation(lastLocation);
+                    locationFound = true;
+                }
+            }
+        };
+
+    };
+
+
+    private GoogleMap mMap;
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        mMap = googleMap;
+
+        mLocationRequest = new LocationRequest();
+        mLocationRequest.setInterval(5000); // 5 second interval
+        mLocationRequest.setFastestInterval(5000);
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_LOW_POWER);
+
+        try{
+            mFusedLocationProviderClient.requestLocationUpdates(mLocationRequest, mLocationCallback, Looper.myLooper());
+            mMap.setMyLocationEnabled(true);
+        }catch (SecurityException e){
+            e.printStackTrace();
+            showToast("mFusedLocationProviderClient failed");
+        }
+
+    }
+
+    private void showToast(String s){
+        Toast.makeText(getActivity(), s, Toast.LENGTH_SHORT).show();
+    }
+
+    void updateLocation(Location location){
+        double latitude = location.getLatitude();
+        double longitude = location.getLongitude();
+
+        LatLng currentLatLng = new LatLng(latitude, longitude);
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 17));
+    }
 
     /**
      * This interface must be implemented by activities that contain this

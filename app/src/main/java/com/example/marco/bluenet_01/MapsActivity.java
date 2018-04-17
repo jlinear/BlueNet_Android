@@ -156,7 +156,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     String detectedDeviceName = detectedDevice.getName();
                     // If there is a message contained in the device name, show it
                     if(detectedDeviceName.matches(".*_BN_.*")){
-                        plotFoundDevice(detectedDeviceName);
+                        //plotFoundDevice(detectedDeviceName);
                     }
                 }
             }
@@ -280,7 +280,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     // When device is found, it is plotted on a map
-    private void plotFoundDevice(String device){
+    /*private void plotFoundDevice(String device){
         showToast("Device Found!");
         String[] deviceInfo = device.split("_");
         LatLng foundDeviceLocation = new LatLng(Double.parseDouble(deviceInfo[4]), Double.parseDouble(deviceInfo[5]));
@@ -299,7 +299,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .add(myLocation)
                 .add(foundDeviceLocation)
         );
-    }
+    }*/
 
     private void showToast(String s){
         Toast.makeText(this, s, Toast.LENGTH_SHORT).show();

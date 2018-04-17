@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -53,7 +54,7 @@ public class MainActivity extends Activity {
             nameView.setText(bluetoothInfo.getString("originalName", ""));
         }
     }
-
+    */
     // Requests location permissions - required for bluetooth searching
     public static boolean hasPermissions(Context context, String... permissions) {
         if (context != null && permissions != null) {
@@ -65,6 +66,7 @@ public class MainActivity extends Activity {
         }
         return true;
     }
+
     private void checkPermissions(){
         int PERMISSION_ALL = 1;
         String[] PERMISSIONS = {Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION};
@@ -73,7 +75,7 @@ public class MainActivity extends Activity {
             ActivityCompat.requestPermissions(this, PERMISSIONS, PERMISSION_ALL);
         }
     }
-
+    /*
     // Enable bluetooth if it is not already enabled
     private void enableBluetooth(){
         if(BluetoothAdapter.getDefaultAdapter().isEnabled()){
@@ -102,7 +104,7 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //checkPermissions();
+        checkPermissions();
         //enableBluetooth();
 
         //setSharedPreferences();
@@ -110,9 +112,17 @@ public class MainActivity extends Activity {
 
     }
 
+    public void hideSoftKeyboard() {
+        if(getCurrentFocus()!=null) {
+            InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+            inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+        }
+    }
+
     public void loginClick(View view) {
         Intent i = new Intent(MainActivity.this, navigationActivity.class);
         i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        hideSoftKeyboard();
         startActivity(i);
         finish();
     }
