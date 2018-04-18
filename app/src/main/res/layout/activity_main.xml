@@ -98,7 +98,7 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="80dp">
+        android:layout_height="40dp">
         <!-- empty for space in middle -->
     </LinearLayout>
 
@@ -107,34 +107,25 @@
         android:layout_height="50dp"
         android:layout_weight="0"
         android:gravity="center|bottom"
-        android:orientation="horizontal">
-        <LinearLayout
-            android:layout_width="20dp"
-            android:layout_height="match_parent">
-            <!-- take up space -->
-        </LinearLayout>
+        android:orientation="vertical">
         <EditText
             android:id="@+id/usernameText"
             android:layout_width="300dp"
             android:layout_height="match_parent"
-            android:maxLines="1"
             android:imeOptions="actionSend"
             android:inputType="text"
+            android:layout_gravity="center"
             android:hint="Enter Username"
             />
-        <Button
-            android:id="@+id/loginButton"
-            android:onClick="loginClick"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_weight="0"
-            android:text="Login"/>
-        <LinearLayout
-            android:layout_width="20dp"
-            android:layout_height="match_parent">
-            <!-- take up space -->
-        </LinearLayout>
     </LinearLayout>
+
+    <Button
+        android:id="@+id/loginButton"
+        android:onClick="loginClick"
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:layout_gravity="center"
+        android:text="Login"/>
 
     <TextView
         android:layout_width="match_parent"

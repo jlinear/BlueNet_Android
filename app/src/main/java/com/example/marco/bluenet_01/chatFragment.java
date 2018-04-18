@@ -1,12 +1,16 @@
 package com.example.marco.bluenet_01;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
+
+import java.util.List;
 
 
 /**
@@ -28,6 +32,8 @@ public class chatFragment extends Fragment {
     private String mParam2;
 
     private OnFragmentInteractionListener mListener;
+    TextView headerText;
+    String headerTextString;
 
     public chatFragment() {
         // Required empty public constructor
@@ -77,6 +83,9 @@ public class chatFragment extends Fragment {
         // For eg: Button btn1= (Button) view.findViewById(R.id.frag1_btn1);
         // btn1.setOnclickListener(...
 
+        headerText = view.findViewById(R.id.chat_header);
+        checkBundle();
+
         return view;
     }
 
@@ -102,6 +111,15 @@ public class chatFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    private void checkBundle(){
+        Bundle bundle = this.getArguments();
+        if (bundle != null) {
+            headerTextString = "Chatting With: " + bundle.getString("chattingName", null);
+            headerText.setTextColor(getResources().getColor(R.color.black));
+            headerText.setText(headerTextString);
+        }
     }
 
     /**

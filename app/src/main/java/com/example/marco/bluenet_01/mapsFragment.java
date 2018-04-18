@@ -1,9 +1,11 @@
 package com.example.marco.bluenet_01;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Looper;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -25,6 +27,8 @@ import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 
 /**
@@ -35,7 +39,7 @@ import com.google.android.gms.maps.model.LatLng;
  * Use the {@link mapsFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class mapsFragment extends Fragment implements OnMapReadyCallback {
+public class mapsFragment extends Fragment implements OnMapReadyCallback  {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -153,6 +157,12 @@ public class mapsFragment extends Fragment implements OnMapReadyCallback {
 
                 // makes sure location is updated in the beginning
                 if(!locationFound){
+                    // add marker for debugging
+                    mMap.addMarker(new MarkerOptions()
+                            .position(new LatLng(lastLocation.getLatitude(),lastLocation.getLongitude()))
+                            .title("Me")
+                            .snippet("This is where i was")
+                    );
                     updateLocation(lastLocation);
                     locationFound = true;
                 }
@@ -179,7 +189,7 @@ public class mapsFragment extends Fragment implements OnMapReadyCallback {
             e.printStackTrace();
             showToast("mFusedLocationProviderClient failed");
         }
-
+        markerTitleClick();
     }
 
     private void showToast(String s){
@@ -194,6 +204,28 @@ public class mapsFragment extends Fragment implements OnMapReadyCallback {
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 17));
     }
 
+    // Switch to Chat view when marker note is clicked
+    void markerTitleClick(){
+        mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+            @Override
+            public void onInfoWindowClick(Marker marker) {
+                // Add name of user to chatView's header
+                chatFragment frag = new chatFragment();
+                Bundle bundle = new Bundle();
+                bundle.putString("chattingName", marker.getTitle());
+                frag.setArguments(bundle);
+
+                //NOTE: Fragment changing code
+                FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+                ft.replace(R.id.mainFrame, frag);
+                NavigationView navigationView = (NavigationView) getActivity().findViewById(R.id.nav_view);
+                navigationView.setCheckedItem(R.id.nav_chat);
+                ft.commit();
+            }
+        });
+    }
+
+
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated
@@ -205,7 +237,6 @@ public class mapsFragment extends Fragment implements OnMapReadyCallback {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
         void onFragmentInteraction(String title);
     }
 }

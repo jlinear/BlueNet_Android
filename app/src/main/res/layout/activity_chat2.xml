@@ -8,12 +8,12 @@
     tools:context="com.example.marco.bluenet_01.Chat2Activity">
 
     <!-- ChatView courtesy of https://github.com/timigod/android-chat-ui -->
-    <co.intentservice.chatui.ChatView
+    <!--<co.intentservice.chatui.ChatView
         android:id="@+id/chat_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         chatview:bubbleElevation="elevated"
         chatview:bubbleBackgroundRcv="@color/white"
-        />
+        />-->
 
 </android.support.constraint.ConstraintLayout>

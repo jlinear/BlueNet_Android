@@ -2,26 +2,24 @@ package com.example.marco.bluenet_01;
 
 import android.Manifest;
 import android.app.Activity;
-import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
-import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
-import android.widget.TextView;
+import android.widget.EditText;
 import android.widget.Toast;
-import android.support.v4.content.ContextCompat;
 
 public class MainActivity extends Activity {
 
     // TODO: Put messages into a database, do chat view
-    // TODO: Make sidebar in map view to display closest users
+
+    private String userName = null;
+    SharedPreferences userNamePreferences;
+    EditText userNameEnter;
 
     /*// Globals
     TextView nameView;
@@ -56,7 +54,7 @@ public class MainActivity extends Activity {
     }
     */
     // Requests location permissions - required for bluetooth searching
-    public static boolean hasPermissions(Context context, String... permissions) {
+    private static boolean hasPermissions(Context context, String... permissions) {
         if (context != null && permissions != null) {
             for (String permission : permissions) {
                 if (ActivityCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
@@ -105,6 +103,9 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
 
         checkPermissions();
+        userNameEnter = findViewById(R.id.usernameText);
+        userNamePreferences = this.getSharedPreferences(BuildConfig.APPLICATION_ID, Context.MODE_PRIVATE);
+        checkSharedPreferences();
         //enableBluetooth();
 
         //setSharedPreferences();
@@ -112,7 +113,22 @@ public class MainActivity extends Activity {
 
     }
 
-    public void hideSoftKeyboard() {
+    private void checkSharedPreferences() {
+        if(!userNamePreferences.getString("userName", "").isEmpty()){
+            userNameEnter.setText(userNamePreferences.getString("userName", ""));
+        }
+    }
+
+    private void setSharedPreferences(){
+        try {
+            userNamePreferences.edit().putString("userName", userNameEnter.getText().toString()).apply();
+        }catch (Exception e){
+            e.printStackTrace();
+            userNamePreferences.edit().putString("userName", "").apply();
+        }
+    }
+
+    private void hideSoftKeyboard() {
         if(getCurrentFocus()!=null) {
             InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
             inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
@@ -122,6 +138,7 @@ public class MainActivity extends Activity {
     public void loginClick(View view) {
         Intent i = new Intent(MainActivity.this, navigationActivity.class);
         i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        setSharedPreferences();
         hideSoftKeyboard();
         startActivity(i);
         finish();

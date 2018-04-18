@@ -38,7 +38,7 @@ public class navigationActivity extends AppCompatActivity
         setContentView(R.layout.activity_navigation);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(ContextCompat.getColor(this, R.color.u_blue_darker)));
+        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(ContextCompat.getColor(this, R.color.darker_blue)));
 
 
         /*FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -143,6 +143,6 @@ public class navigationActivity extends AppCompatActivity
     public void onFragmentInteraction(String title) {
         // NOTE:  Code to replace the toolbar title based current visible fragment
         getSupportActionBar().setTitle(title);
-
     }
+
 }

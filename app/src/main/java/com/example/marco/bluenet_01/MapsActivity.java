@@ -120,7 +120,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                     imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
 
-                    mapBroadcastClick(null);
+                    //mapBroadcastClick(null);
                     return true;
                 }
                 return false;
@@ -257,7 +257,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         currentLocation = location;
     }
 
-    public void mapFindDevicesClick(View view){
+    /*public void mapFindDevicesClick(View view){
         // when find devices is clicked
         mMap.clear();
         BlueNet.findDevices(10);
@@ -268,16 +268,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 showToast("there is a new message.");
             }
         }*/
-    }
+    //}
 
     // when broadcast is clicked
-    public void mapBroadcastClick(View view){
+    /*public void mapBroadcastClick(View view){
         showToast("Broadcasted!");
         // send message
         deviceNameText.setText(BlueNet.sendMessage(broadcastInput.getText().toString(), currentLocation));
         // erases sent input
         broadcastInput.setText("");
-    }
+    }*/
 
     // When device is found, it is plotted on a map
     /*private void plotFoundDevice(String device){

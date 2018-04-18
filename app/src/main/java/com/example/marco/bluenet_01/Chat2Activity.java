@@ -1,15 +1,15 @@
 package com.example.marco.bluenet_01;
 
-import android.hardware.camera2.params.BlackLevelPattern;
+//import android.hardware.camera2.params.BlackLevelPattern;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
-import co.intentservice.chatui.ChatView;
-import co.intentservice.chatui.models.ChatMessage;
+//import co.intentservice.chatui.ChatView;
+//import co.intentservice.chatui.models.ChatMessage;
 
 public class Chat2Activity extends AppCompatActivity {
 
-    ChatView chatView;
+    /*ChatView chatView;
     BlueNetInterface BlueNet;
 
     @Override
@@ -29,5 +29,5 @@ public class Chat2Activity extends AppCompatActivity {
     }
 
 
-
+*/
 }
