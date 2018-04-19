@@ -1,10 +1,12 @@
 package com.example.marco.bluenet_01;
 
+import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,6 +32,8 @@ public class chatFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+
+    private CentralService mCentral = new CentralService();
 
     private OnFragmentInteractionListener mListener;
     TextView headerText;
@@ -64,6 +68,10 @@ public class chatFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+
+        Bundle bundle = this.getArguments();
+        BluetoothDevice mDevice = bundle.getParcelable("device");
+        mCentral.connect(mDevice);
     }
 
     @Override

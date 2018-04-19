@@ -112,6 +112,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        //BleBasic.mBleDevicesDict.clear();
         // make sure discovery isn't running
         if(BA != null){
             BA.cancelDiscovery();
@@ -273,6 +274,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
     public void mapFindDevicesClick(View view){
+        //BleBasic.mBleDevicesDict.clear();
         mMap.clear();
         BleBasic.findDevices(3000);
         Log.d("D","size " + BleBasic.mBleDevicesDict.size());

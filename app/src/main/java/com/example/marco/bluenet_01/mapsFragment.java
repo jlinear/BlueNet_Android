@@ -2,6 +2,7 @@ package com.example.marco.bluenet_01;
 
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Location;
 import android.os.Bundle;
@@ -57,6 +58,7 @@ public class mapsFragment extends Fragment implements OnMapReadyCallback  {
 
     private Button findDevices;
     private BleBasicService BleBasic;
+    HashMap<Marker, BluetoothDevice> marker2device = new HashMap<Marker, BluetoothDevice>();
 
     private OnFragmentInteractionListener mListener;
     FusedLocationProviderClient mFusedLocationProviderClient;
@@ -109,6 +111,8 @@ public class mapsFragment extends Fragment implements OnMapReadyCallback  {
         findDevices.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                //BleBasic.mBleDevicesDict.clear();
                 mMap.clear();
                 BleBasic.findDevices(3000);
                 Log.d("D","size " + BleBasic.mBleDevicesDict.size());
@@ -118,13 +122,15 @@ public class mapsFragment extends Fragment implements OnMapReadyCallback  {
                     Double Latitude = AdvertisementPayload.parse_scan_payload(payload).getLatitude();
                     Double Longitude = AdvertisementPayload.parse_scan_payload(payload).getLongitude();
                     String userID = AdvertisementPayload.parse_scan_payload(payload).getProvider();
-                    mMap.addMarker(new MarkerOptions()
+                    Marker temp_Marker;
+                    temp_Marker = mMap.addMarker(new MarkerOptions()
                             .position(new LatLng(Latitude,Longitude))
                             .title(userID)
                             .snippet("nearby user")
                             .icon(BitmapDescriptorFactory
                                     .defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
                     );
+                    marker2device.put(temp_Marker,device);
                 }
             }
         });
@@ -179,6 +185,7 @@ public class mapsFragment extends Fragment implements OnMapReadyCallback  {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+        //BleBasic.mBleDevicesDict.clear();
 
         //stop location updates when Activity is no longer active
         if (mFusedLocationProviderClient != null) {
@@ -256,6 +263,7 @@ public class mapsFragment extends Fragment implements OnMapReadyCallback  {
                 chatFragment frag = new chatFragment();
                 Bundle bundle = new Bundle();
                 bundle.putString("chattingName", marker.getTitle());
+                bundle.putParcelable("device",marker2device.get(marker));
                 frag.setArguments(bundle);
 
                 //NOTE: Fragment changing code
@@ -264,6 +272,7 @@ public class mapsFragment extends Fragment implements OnMapReadyCallback  {
                 NavigationView navigationView = (NavigationView) getActivity().findViewById(R.id.nav_view);
                 navigationView.setCheckedItem(R.id.nav_chat);
                 ft.commit();
+                Log.d("DDDD", marker2device.get(marker).getAddress());
             }
         });
     }
