@@ -12,6 +12,9 @@ import android.widget.TextView;
 
 import java.util.List;
 
+import co.intentservice.chatui.ChatView;
+import co.intentservice.chatui.models.ChatMessage;
+
 
 /**
  * A simple {@link Fragment} subclass.
@@ -34,6 +37,16 @@ public class chatFragment extends Fragment {
     private OnFragmentInteractionListener mListener;
     TextView headerText;
     String headerTextString;
+    ChatView chatView;
+    BlueNetInterface blueNetInterface;
+    String chattingWith;
+
+    blueNetInterface.regCallback(new Result() {
+        public int provide (String src, String data) {
+            //write Strings to relevant chat place
+            return 0;
+        }
+    });
 
     public chatFragment() {
         // Required empty public constructor
@@ -86,6 +99,16 @@ public class chatFragment extends Fragment {
         headerText = view.findViewById(R.id.chat_header);
         checkBundle();
 
+        // Send message through bluenet and receive on device
+        chatView = view.findViewById(R.id.chat_view);
+        chatView.setOnSentMessageListener(new ChatView.OnSentMessageListener() {
+            @Override
+            public boolean sendMessage(ChatMessage chatMessage) {
+                blueNetInterface.write(chattingWith, chatMessage.getMessage());
+                return true;
+            }
+        });
+
         return view;
     }
 
@@ -116,7 +139,8 @@ public class chatFragment extends Fragment {
     private void checkBundle(){
         Bundle bundle = this.getArguments();
         if (bundle != null) {
-            headerTextString = "Chatting With: " + bundle.getString("chattingName", null);
+            chattingWith = bundle.getString("chattingName", null);
+            headerTextString = "Chatting With: " + chattingWith;
             headerText.setTextColor(getResources().getColor(R.color.black));
             headerText.setText(headerTextString);
         }

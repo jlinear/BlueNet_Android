@@ -28,7 +28,7 @@ import java.util.List;
  * Created by jerry on 4/18/18.
  */
 
-public class BleBasicService {
+public class BleBasicService implements BlueNetIFace{
 
     private static final String ERR_TAG = "FATAL ERROR";
     private static final String INFO_TAG = "APP_INFO";
@@ -56,6 +56,30 @@ public class BleBasicService {
 
     public HashMap<BluetoothDevice, byte[]> mBleDevicesDict;
     /**** **** end of variable declaration **** ****/
+
+    /****************Interface implementation*******************************/
+
+    private Result mResultCB = null;
+
+    public String getMyID() {
+        return new String(); // not used right now
+    }
+
+    public int write(String destID, String input) {
+        //destID ignored for now
+        //distinguish between message and location payloads
+        restartLeAdvertising(input.getBytes());
+    }
+    public void regCallback(Result resultHandler) {
+        mResultCB = resultHandler;
+    }
+    public String[] getNeighbors() {
+        return String[1](); //not used right now
+    }
+    public String getLocation(String id) {
+        return new String(); //not used right now
+    }
+
 
 
     BleBasicService(Context context, Activity activity){
@@ -216,13 +240,26 @@ public class BleBasicService {
             //Log.v(ADSCActivity.class.getSimpleName(), "Process scan results");
             if(!mBleDevicesDict.containsKey(result.getDevice())) {
                 byte[] scan_payload = result.getScanRecord().getServiceData().get(PAYLOAD_SERVICE);
-                Double Lat = AdvertisementPayload.parse_scan_payload(scan_payload).getLatitude();
-                Double Long = AdvertisementPayload.parse_scan_payload((scan_payload)).getLongitude();
+                
+                // check for whatever distinguishes a message payload from location payload
+                boolean isMessage = false;
+
                 String userID = AdvertisementPayload.parse_scan_payload(scan_payload).getProvider();
 
-//                String payload = new String(result.getScanRecord().getServiceData().get(PAYLOAD_SERVICE));
-                Log.d("DEBUG",result.getDevice().getName() + ' ' + Lat + ',' + Long + ';' + userID);
-                mBleDevicesDict.put(result.getDevice(), scan_payload);
+                if (isMessage) {
+
+                    String message = new String(); //AdvertisementPayload.parse_scan_payload(scan_payload).getMessage();
+                    mResultCB.provide(userID, message)
+                }
+                else {
+
+                    Double Lat = AdvertisementPayload.parse_scan_payload(scan_payload).getLatitude();
+                    Double Long = AdvertisementPayload.parse_scan_payload((scan_payload)).getLongitude();
+
+    //                String payload = new String(result.getScanRecord().getServiceData().get(PAYLOAD_SERVICE));
+                    Log.d("DEBUG",result.getDevice().getName() + ' ' + Lat + ',' + Long + ';' + userID);
+                    mBleDevicesDict.put(result.getDevice(), scan_payload);
+                }
             }
 
             //Log.d(DEBUG_TAG,"# of available devices: " + Integer.toString(mBleDevicesDict.size()));
