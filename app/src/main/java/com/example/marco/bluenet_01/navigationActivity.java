@@ -8,6 +8,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -25,6 +26,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.CompoundButton;
+import android.widget.TextView;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationRequest;
@@ -43,7 +45,7 @@ public class navigationActivity extends AppCompatActivity
 
     private FusedLocationProviderClient mFusedLocationClient;
     BleBasicService BleBasic;
-    SwitchCompat discoverable;
+    //SwitchCompat discoverable;
 
     Fragment mapsFragment = new mapsFragment();
     @Override
@@ -73,6 +75,13 @@ public class navigationActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+        // Set navigation drawer header
+        View headerView = navigationView.getHeaderView(0);
+        TextView navUser = (TextView) headerView.findViewById(R.id.userIDNavBar);
+        navUser.setText(PreferenceManager.getDefaultSharedPreferences(this).getString("userName", ""));
+        TextView navStatus = (TextView) headerView.findViewById(R.id.statusNavBar);
+        navStatus.setText(PreferenceManager.getDefaultSharedPreferences(this).getString("statusPref", ""));
+
         /* From http://www.arjunsk.com/android/how-to-use-fragment-layout-and-scroll-layout-in-android-studio/ */
         //NOTE:  Checks first item in the navigation drawer initially
         navigationView.setCheckedItem(R.id.nav_maps);
@@ -82,12 +91,12 @@ public class navigationActivity extends AppCompatActivity
         ft.replace(R.id.mainFrame, new mapsFragment());
         ft.commit();
 
-        SwitchCompat discoverable = (SwitchCompat) findViewById(R.id.switcher);
+        //SwitchCompat discoverable = (SwitchCompat) findViewById(R.id.switcher);
         //discoverable.setSwitchPadding(40);
         //discoverable.setOnCheckedChangeListener(this);
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-        BleBasic = new BleBasicService(getApplicationContext(),getParent());
+        BleBasic = new BleBasicService(getApplicationContext(),this);
 
     }
 
