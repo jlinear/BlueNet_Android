@@ -1,5 +1,6 @@
 package com.example.marco.bluenet_01;
 
+import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.location.Location;
@@ -14,6 +15,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -26,9 +28,13 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+
+import java.nio.ByteBuffer;
+import java.util.HashMap;
 
 
 /**
@@ -48,6 +54,9 @@ public class mapsFragment extends Fragment implements OnMapReadyCallback  {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+
+    private Button findDevices;
+    private BleBasicService BleBasic;
 
     private OnFragmentInteractionListener mListener;
     FusedLocationProviderClient mFusedLocationProviderClient;
@@ -85,13 +94,40 @@ public class mapsFragment extends Fragment implements OnMapReadyCallback  {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+        BleBasic = new BleBasicService(getContext(),getActivity());
     }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_maps, container, false);
+
+        //in a android fragment, cannot apply android:onClick method in xml
+        View findDevices = view.findViewById(R.id.mapFindDevicesButton);
+        findDevices.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mMap.clear();
+                BleBasic.findDevices(3000);
+                Log.d("D","size " + BleBasic.mBleDevicesDict.size());
+                for (HashMap.Entry<BluetoothDevice, byte[]> entry : BleBasic.mBleDevicesDict.entrySet()) {
+                    BluetoothDevice device = entry.getKey();
+                    byte[] payload = entry.getValue();
+                    Double Latitude = AdvertisementPayload.parse_scan_payload(payload).getLatitude();
+                    Double Longitude = AdvertisementPayload.parse_scan_payload(payload).getLongitude();
+                    String userID = AdvertisementPayload.parse_scan_payload(payload).getProvider();
+                    mMap.addMarker(new MarkerOptions()
+                            .position(new LatLng(Latitude,Longitude))
+                            .title(userID)
+                            .snippet("nearby user")
+                            .icon(BitmapDescriptorFactory
+                                    .defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
+                    );
+                }
+            }
+        });
 
         // NOTE : We are calling the onFragmentInteraction() declared in the MainActivity
         // ie we are sending "Fragment 1" as title parameter when fragment1 is activated
@@ -123,6 +159,7 @@ public class mapsFragment extends Fragment implements OnMapReadyCallback  {
             e.printStackTrace();
         }
 
+
         return view;
     }
 
@@ -135,6 +172,7 @@ public class mapsFragment extends Fragment implements OnMapReadyCallback  {
             throw new RuntimeException(context.toString()
                     + " must implement OnFragmentInteractionListener");
         }
+
     }
 
     @Override
@@ -153,6 +191,8 @@ public class mapsFragment extends Fragment implements OnMapReadyCallback  {
         public void onLocationResult(LocationResult locationResult) {
             for (Location location : locationResult.getLocations()) {
                 Log.i("MapsActivity", "Location: " + location.getLatitude() + " " + location.getLongitude());
+                //Log.d("DUBUG","haha" + ' ' + toDouble(toByteArray(location.getLatitude())));
+
                 lastLocation = location;
 
                 // makes sure location is updated in the beginning
@@ -160,8 +200,11 @@ public class mapsFragment extends Fragment implements OnMapReadyCallback  {
                     // add marker for debugging
                     mMap.addMarker(new MarkerOptions()
                             .position(new LatLng(lastLocation.getLatitude(),lastLocation.getLongitude()))
-                            .title("Me")
+                            //.title("Me")
+                            .title(getActivity().getIntent().getStringExtra("userName"))
                             .snippet("This is where i was")
+                            .icon(BitmapDescriptorFactory
+                                    .defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
                     );
                     updateLocation(lastLocation);
                     locationFound = true;
@@ -170,7 +213,6 @@ public class mapsFragment extends Fragment implements OnMapReadyCallback  {
         };
 
     };
-
 
     private GoogleMap mMap;
     @Override
@@ -190,6 +232,7 @@ public class mapsFragment extends Fragment implements OnMapReadyCallback  {
             showToast("mFusedLocationProviderClient failed");
         }
         markerTitleClick();
+
     }
 
     private void showToast(String s){
@@ -224,6 +267,7 @@ public class mapsFragment extends Fragment implements OnMapReadyCallback  {
             }
         });
     }
+
 
 
     /**

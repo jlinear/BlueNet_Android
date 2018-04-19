@@ -13,11 +13,13 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.ListView;
@@ -34,6 +36,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 
 import java.util.Calendar;
+import java.util.HashMap;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, LocationListener {
 
@@ -43,7 +46,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     String originalName;
     TextView deviceNameText;
     EditText broadcastInput;
+
     private BluenetService BlueNet;
+    private BleBasicService BleBasic;
     private BluetoothAdapter BA;
     // Temporary listviews to detect changes in bluenet
     ListView messagesList;
@@ -60,11 +65,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+//        findDevices = findViewById(R.id.mapFindDevicesButton);
+//        findDevices.setOnClickListener(findDevicesClickListener);
+
+        /*****
         // Initialize BlueNet
         BlueNet = new BluenetService(getApplicationContext(), this);
         BA = BlueNet.getBluetoothAdapter();
         //BlueNet.setReceiver();
         setReceiver();
+        *****/
+        BleBasic = new BleBasicService(getApplicationContext(),this);
+
 
         // Initialize ListViews
         // TODO: Listviews on side of display which show closest users
@@ -218,6 +230,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             e.printStackTrace();
             showToast("Cannot get location, enable location services.");
         }
+
     }
 
     @Override
@@ -257,18 +270,44 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         currentLocation = location;
     }
 
-    /*public void mapFindDevicesClick(View view){
-        // when find devices is clicked
+
+
+    public void mapFindDevicesClick(View view){
         mMap.clear();
-        BlueNet.findDevices(10);
-        /*messagesList.setAdapter(BlueNet.arrayMessagesAdapter);
-        while(BA.isDiscovering()) {
-            showToast("looking for messages");
-            if (numMessages < BlueNet.messagesList.size()) {
-                showToast("there is a new message.");
-            }
-        }*/
-    //}
+        BleBasic.findDevices(3000);
+        Log.d("D","size " + BleBasic.mBleDevicesDict.size());
+        for (HashMap.Entry<BluetoothDevice, byte[]> entry : BleBasic.mBleDevicesDict.entrySet()) {
+            BluetoothDevice device = entry.getKey();
+            byte[] payload = entry.getValue();
+            Double Latitude = AdvertisementPayload.parse_scan_payload(payload).getLatitude();
+            Double Longitude = AdvertisementPayload.parse_scan_payload(payload).getLongitude();
+            String userID = AdvertisementPayload.parse_scan_payload(payload).getProvider();
+            mMap.addMarker(new MarkerOptions()
+                    .position(new LatLng(Latitude,Longitude))
+                    //.title("Me")
+                    .title(userID)
+                    .snippet("nearby user")
+                    .icon(BitmapDescriptorFactory
+                            .defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
+            );
+        }
+
+    }
+
+
+//    public void mapFindDevicesClick(View view){
+//
+//        // when find devices is clicked
+//        mMap.clear();
+//        BlueNet.findDevices(10);
+//        messagesList.setAdapter(BlueNet.arrayMessagesAdapter);
+//        while(BA.isDiscovering()) {
+//            showToast("looking for messages");
+//            if (numMessages < BlueNet.messagesList.size()) {
+//                showToast("there is a new message.");
+//            }
+//        }
+//    }
 
     // when broadcast is clicked
     /*public void mapBroadcastClick(View view){

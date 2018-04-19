@@ -17,7 +17,7 @@ public class MainActivity extends Activity {
 
     // TODO: Put messages into a database, do chat view
 
-    private String userName = null;
+    protected String userName = null;
     SharedPreferences userNamePreferences;
     EditText userNameEnter;
 
@@ -122,6 +122,7 @@ public class MainActivity extends Activity {
     private void setSharedPreferences(){
         try {
             userNamePreferences.edit().putString("userName", userNameEnter.getText().toString()).apply();
+            userName = userNameEnter.getText().toString();
         }catch (Exception e){
             e.printStackTrace();
             userNamePreferences.edit().putString("userName", "").apply();
@@ -139,6 +140,7 @@ public class MainActivity extends Activity {
         Intent i = new Intent(MainActivity.this, navigationActivity.class);
         i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         setSharedPreferences();
+        i.putExtra("userName", userName);
         hideSoftKeyboard();
         startActivity(i);
         finish();

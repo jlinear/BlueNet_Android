@@ -5,6 +5,7 @@ import android.app.FragmentManager;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -12,6 +13,8 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.SwitchCompat;
+import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -21,6 +24,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.CompoundButton;
+
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.tasks.OnSuccessListener;
 
 public class navigationActivity extends AppCompatActivity
         implements
@@ -29,7 +39,11 @@ public class navigationActivity extends AppCompatActivity
         profileFragment.OnFragmentInteractionListener,
         protocolFragment.OnFragmentInteractionListener,
         aboutFragment.OnFragmentInteractionListener,
-        NavigationView.OnNavigationItemSelectedListener {
+        NavigationView.OnNavigationItemSelectedListener{
+
+    private FusedLocationProviderClient mFusedLocationClient;
+    BleBasicService BleBasic;
+    SwitchCompat discoverable;
 
     Fragment mapsFragment = new mapsFragment();
     @Override
@@ -67,6 +81,14 @@ public class navigationActivity extends AppCompatActivity
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.mainFrame, new mapsFragment());
         ft.commit();
+
+        SwitchCompat discoverable = (SwitchCompat) findViewById(R.id.switcher);
+        //discoverable.setSwitchPadding(40);
+        //discoverable.setOnCheckedChangeListener(this);
+
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        BleBasic = new BleBasicService(getApplicationContext(),getParent());
+
     }
 
     @Override
@@ -144,5 +166,40 @@ public class navigationActivity extends AppCompatActivity
         // NOTE:  Code to replace the toolbar title based current visible fragment
         getSupportActionBar().setTitle(title);
     }
+
+//    private final CompoundButton.OnCheckedChangeListener onCheckedChangeListener = new CompoundButton.OnCheckedChangeListener() {
+//        @Override
+//        public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+//            if(b){
+//                Log.d("DDDD", "switch is on!");
+//            }
+//        }
+//    };
+
+//    @Override
+//    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked){
+//
+//        if(isChecked){
+//            Log.d("DDD" , "haha");
+////            mFusedLocationClient.getLastLocation()
+////                    .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+////                        @Override
+////                        public void onSuccess(Location location) {
+////                            // Got last known location. In some rare situations this can be null.
+////                            if (location != null) {
+////                                AdvertisementPayload outPayload = new AdvertisementPayload();
+////                                outPayload.setUserID(getIntent().getStringExtra("userName"));
+////                                outPayload.setLocation(location);
+////                                byte[] out = outPayload.getPayload();
+////                                BleBasic.startLeAdvertising(out);
+////                            }else{
+////                                throw new RuntimeException("Switch:" + " null location");
+////                            }
+////                        }
+////                    });
+//        }else{
+//            //BleBasic.stopAdvertising();
+//        }
+//    }
 
 }
