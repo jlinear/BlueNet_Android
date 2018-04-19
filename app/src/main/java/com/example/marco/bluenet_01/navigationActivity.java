@@ -1,8 +1,10 @@
 package com.example.marco.bluenet_01;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.FragmentManager;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
@@ -11,6 +13,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
@@ -41,13 +44,14 @@ public class navigationActivity extends AppCompatActivity
         profileFragment.OnFragmentInteractionListener,
         protocolFragment.OnFragmentInteractionListener,
         aboutFragment.OnFragmentInteractionListener,
-        NavigationView.OnNavigationItemSelectedListener{
+        NavigationView.OnNavigationItemSelectedListener,
+        CompoundButton.OnCheckedChangeListener {
 
     private FusedLocationProviderClient mFusedLocationClient;
     BleBasicService BleBasic;
-    //SwitchCompat discoverable;
 
     Fragment mapsFragment = new mapsFragment();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,7 +59,6 @@ public class navigationActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(ContextCompat.getColor(this, R.color.darker_blue)));
-
 
         /*FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -91,12 +94,8 @@ public class navigationActivity extends AppCompatActivity
         ft.replace(R.id.mainFrame, new mapsFragment());
         ft.commit();
 
-        //SwitchCompat discoverable = (SwitchCompat) findViewById(R.id.switcher);
-        //discoverable.setSwitchPadding(40);
-        //discoverable.setOnCheckedChangeListener(this);
-
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-        BleBasic = new BleBasicService(getApplicationContext(),this);
+        BleBasic = new BleBasicService(getApplicationContext(), this);
 
     }
 
@@ -118,6 +117,21 @@ public class navigationActivity extends AppCompatActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.navigation, menu);
+
+        SwitchCompat discoverable = (SwitchCompat) findViewById(R.id.switcher);
+        discoverable.setOnCheckedChangeListener(this);
+        //discoverable.setSwitchPadding(40);
+//        discoverable.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+//            @Override
+//            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+//                if (b){
+//                    Log.d("DDD" , "haha");
+//                }else{
+//                    Log.d("HHH","stoped");
+//                }
+//            }
+//        });
+
         return true;
     }
 
@@ -185,30 +199,46 @@ public class navigationActivity extends AppCompatActivity
 //        }
 //    };
 
-//    @Override
-//    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked){
-//
-//        if(isChecked){
-//            Log.d("DDD" , "haha");
-////            mFusedLocationClient.getLastLocation()
-////                    .addOnSuccessListener(this, new OnSuccessListener<Location>() {
-////                        @Override
-////                        public void onSuccess(Location location) {
-////                            // Got last known location. In some rare situations this can be null.
-////                            if (location != null) {
-////                                AdvertisementPayload outPayload = new AdvertisementPayload();
-////                                outPayload.setUserID(getIntent().getStringExtra("userName"));
-////                                outPayload.setLocation(location);
-////                                byte[] out = outPayload.getPayload();
-////                                BleBasic.startLeAdvertising(out);
-////                            }else{
-////                                throw new RuntimeException("Switch:" + " null location");
-////                            }
-////                        }
-////                    });
-//        }else{
-//            //BleBasic.stopAdvertising();
-//        }
-//    }
+    @Override
+    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        if (isChecked) {
+            Log.d("DDD", "haha");
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                    && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                // TODO: Consider calling
+                //    ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
+                        1);
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                        1);
+                return;
+            }
+            mFusedLocationClient.getLastLocation()
+                    .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                        @Override
+                        public void onSuccess(Location location) {
+                            // Got last known location. In some rare situations this can be null.
+                            if (location != null) {
+                                AdvertisementPayload outPayload = new AdvertisementPayload();
+                                outPayload.setUserID(getIntent().getStringExtra("userName"));
+                                outPayload.setLocation(location);
+                                byte[] out = outPayload.getPayload();
+                                BleBasic.startLeAdvertising(out);
+                            } else {
+                                throw new RuntimeException("Switch:" + " null location");
+                            }
+                        }
+                    });
+        }else{
+            BleBasic.stopAdvertising();
+        }
+    }
 
 }
