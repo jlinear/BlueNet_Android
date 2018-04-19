@@ -1,12 +1,14 @@
 package com.example.marco.bluenet_01;
 
 import android.content.Context;
-import android.net.Uri;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
+import android.support.v7.preference.EditTextPreference;
+import android.support.v7.preference.Preference;
+import android.support.v7.preference.PreferenceFragmentCompat;
+import android.widget.Toast;
 
 
 /**
@@ -17,17 +19,20 @@ import android.view.ViewGroup;
  * Use the {@link profileFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class profileFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
+public class profileFragment extends PreferenceFragmentCompat implements SharedPreferences.OnSharedPreferenceChangeListener{
+    // TODO: Fix keyboard not closing
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
-    // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
 
     private OnFragmentInteractionListener mListener;
+    private SharedPreferences sharedPreferences;
+    //private EditTextPreference userName_editText;
+    android.support.v7.preference.EditTextPreference editTextPreference;
+
 
     public profileFragment() {
         // Required empty public constructor
@@ -61,6 +66,24 @@ public class profileFragment extends Fragment {
     }
 
     @Override
+    public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
+        if (mListener != null) {
+            mListener.onFragmentInteraction("Profile Settings");
+        }
+        addPreferencesFromResource(R.xml.preference_screen);
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+
+        onSharedPreferenceChanged(sharedPreferences, "userName");
+        getPreferenceScreen().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
+
+        EditTextPreference userPreference = (EditTextPreference) findPreference("userName");
+        EditTextPreference statusPreference = (EditTextPreference) findPreference("statusPref");
+        userPreference.setSummary(userPreference.getText());
+        statusPreference.setSummary(statusPreference.getText());
+    }
+
+    // Not used because fragment_profile is unused
+    /*@Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
@@ -78,14 +101,8 @@ public class profileFragment extends Fragment {
         // btn1.setOnclickListener(...
 
         return view;
-    }
-
-    // TODO: Rename method, update argument and hook method into UI event
-    /*public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
     }*/
+
 
     @Override
     public void onAttach(Context context) {
@@ -102,7 +119,27 @@ public class profileFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+        getPreferenceScreen().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
     }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
+        Preference preference = findPreference(s);
+        if(preference instanceof android.support.v7.preference.EditTextPreference){
+            editTextPreference = (android.support.v7.preference.EditTextPreference) preference;
+            String textString = editTextPreference.getText();
+            if(textString.equals("")){
+                showToast("Please do not leave blank.");
+                editTextPreference.setText("default");
+            }
+            editTextPreference.setSummary(editTextPreference.getText());
+        }
+    }
+
+    private void showToast(String s){
+        Toast.makeText(getActivity(), s, Toast.LENGTH_SHORT).show();
+    }
+
 
     /**
      * This interface must be implemented by activities that contain this
@@ -115,7 +152,6 @@ public class profileFragment extends Fragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
         void onFragmentInteraction(String title);
     }
 }

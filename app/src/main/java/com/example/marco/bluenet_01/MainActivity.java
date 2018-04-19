@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
+import android.support.v7.preference.PreferenceManager;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
@@ -104,7 +105,7 @@ public class MainActivity extends Activity {
 
         checkPermissions();
         userNameEnter = findViewById(R.id.usernameText);
-        userNamePreferences = this.getSharedPreferences(BuildConfig.APPLICATION_ID, Context.MODE_PRIVATE);
+        userNamePreferences = PreferenceManager.getDefaultSharedPreferences(this);//this.getSharedPreferences(BuildConfig.APPLICATION_ID, Context.MODE_PRIVATE);
         checkSharedPreferences();
         //enableBluetooth();
 
@@ -126,6 +127,8 @@ public class MainActivity extends Activity {
             e.printStackTrace();
             userNamePreferences.edit().putString("userName", "").apply();
         }
+        // When user logs on, their status is always default
+        userNamePreferences.edit().putString("statusPref", "default").apply();
     }
 
     private void hideSoftKeyboard() {
@@ -136,6 +139,11 @@ public class MainActivity extends Activity {
     }
 
     public void loginClick(View view) {
+        if(userNameEnter.getText().toString().equals("")){
+            showToast("Please Enter a User Name.");
+            hideSoftKeyboard();
+            return;
+        }
         Intent i = new Intent(MainActivity.this, navigationActivity.class);
         i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         setSharedPreferences();

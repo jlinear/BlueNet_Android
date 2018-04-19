@@ -9,6 +9,7 @@ import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -160,8 +161,8 @@ public class mapsFragment extends Fragment implements OnMapReadyCallback  {
                     // add marker for debugging
                     mMap.addMarker(new MarkerOptions()
                             .position(new LatLng(lastLocation.getLatitude(),lastLocation.getLongitude()))
-                            .title("Me")
-                            .snippet("This is where i was")
+                            .title(PreferenceManager.getDefaultSharedPreferences(getContext()).getString("userName", ""))
+                            .snippet(PreferenceManager.getDefaultSharedPreferences(getContext()).getString("statusPref", ""))
                     );
                     updateLocation(lastLocation);
                     locationFound = true;
