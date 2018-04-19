@@ -81,6 +81,7 @@ public class navigationActivity extends AppCompatActivity
         // Set navigation drawer header
         View headerView = navigationView.getHeaderView(0);
         TextView navUser = (TextView) headerView.findViewById(R.id.userIDNavBar);
+        //navUser.setText(getIntent().getExtras("userName"));
         navUser.setText(PreferenceManager.getDefaultSharedPreferences(this).getString("userName", ""));
         TextView navStatus = (TextView) headerView.findViewById(R.id.statusNavBar);
         navStatus.setText(PreferenceManager.getDefaultSharedPreferences(this).getString("statusPref", ""));

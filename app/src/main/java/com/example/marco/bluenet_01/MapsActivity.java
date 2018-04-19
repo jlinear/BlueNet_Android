@@ -275,24 +275,24 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     public void mapFindDevicesClick(View view){
         //BleBasic.mBleDevicesDict.clear();
-        mMap.clear();
-        BleBasic.findDevices(3000);
-        Log.d("D","size " + BleBasic.mBleDevicesDict.size());
-        for (HashMap.Entry<BluetoothDevice, byte[]> entry : BleBasic.mBleDevicesDict.entrySet()) {
-            BluetoothDevice device = entry.getKey();
-            byte[] payload = entry.getValue();
-            Double Latitude = AdvertisementPayload.parse_scan_payload(payload).getLatitude();
-            Double Longitude = AdvertisementPayload.parse_scan_payload(payload).getLongitude();
-            String userID = AdvertisementPayload.parse_scan_payload(payload).getProvider();
-            mMap.addMarker(new MarkerOptions()
-                    .position(new LatLng(Latitude,Longitude))
-                    //.title("Me")
-                    .title(userID)
-                    .snippet("nearby user")
-                    .icon(BitmapDescriptorFactory
-                            .defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
-            );
-        }
+//        mMap.clear();
+//        BleBasic.findDevices(3000);
+//        Log.d("D","size " + BleBasic.mBleDevicesDict.size());
+//        for (HashMap.Entry<BluetoothDevice, byte[]> entry : BleBasic.mBleDevicesDict.entrySet()) {
+//            BluetoothDevice device = entry.getKey();
+//            byte[] payload = entry.getValue();
+//            Double Latitude = AdvertisementPayload.parse_scan_payload(payload).getLatitude();
+//            Double Longitude = AdvertisementPayload.parse_scan_payload(payload).getLongitude();
+//            String userID = AdvertisementPayload.parse_scan_payload(payload).getProvider();
+//            mMap.addMarker(new MarkerOptions()
+//                    .position(new LatLng(Latitude,Longitude))
+//                    //.title("Me")
+//                    .title(userID)
+//                    .snippet("nearby user")
+//                    .icon(BitmapDescriptorFactory
+//                            .defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
+//            );
+//        }
 
     }
 

@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -104,7 +105,7 @@ public class MainActivity extends Activity {
 
         checkPermissions();
         userNameEnter = findViewById(R.id.usernameText);
-        userNamePreferences = this.getSharedPreferences(BuildConfig.APPLICATION_ID, Context.MODE_PRIVATE);
+        userNamePreferences = PreferenceManager.getDefaultSharedPreferences(this);//this.getSharedPreferences(BuildConfig.APPLICATION_ID, Context.MODE_PRIVATE);
         checkSharedPreferences();
         //enableBluetooth();
 
@@ -122,11 +123,13 @@ public class MainActivity extends Activity {
     private void setSharedPreferences(){
         try {
             userNamePreferences.edit().putString("userName", userNameEnter.getText().toString()).apply();
-            userName = userNameEnter.getText().toString();
+            //userName = userNameEnter.getText().toString();
         }catch (Exception e){
             e.printStackTrace();
             userNamePreferences.edit().putString("userName", "").apply();
         }
+        // When user logs on, their status is always default
+        userNamePreferences.edit().putString("statusPref", "default").apply();
     }
 
     private void hideSoftKeyboard() {
@@ -137,10 +140,15 @@ public class MainActivity extends Activity {
     }
 
     public void loginClick(View view) {
+        if(userNameEnter.getText().toString().equals("")){
+            showToast("Please Enter a User Name.");
+            hideSoftKeyboard();
+            return;
+        }
         Intent i = new Intent(MainActivity.this, navigationActivity.class);
         i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         setSharedPreferences();
-        i.putExtra("userName", userName);
+//        i.putExtra("userName", userName);
         hideSoftKeyboard();
         startActivity(i);
         finish();
