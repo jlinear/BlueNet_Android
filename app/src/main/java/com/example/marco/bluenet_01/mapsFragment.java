@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Looper;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
@@ -111,27 +112,33 @@ public class mapsFragment extends Fragment implements OnMapReadyCallback  {
         findDevices.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-                //BleBasic.mBleDevicesDict.clear();
+                BleBasic.mBleDevicesDict.clear();
+                marker2device.clear();
                 mMap.clear();
-                BleBasic.findDevices(3000);
-                Log.d("D","size " + BleBasic.mBleDevicesDict.size());
-                for (HashMap.Entry<BluetoothDevice, byte[]> entry : BleBasic.mBleDevicesDict.entrySet()) {
-                    BluetoothDevice device = entry.getKey();
-                    byte[] payload = entry.getValue();
-                    Double Latitude = AdvertisementPayload.parse_scan_payload(payload).getLatitude();
-                    Double Longitude = AdvertisementPayload.parse_scan_payload(payload).getLongitude();
-                    String userID = AdvertisementPayload.parse_scan_payload(payload).getProvider();
-                    Marker temp_Marker;
-                    temp_Marker = mMap.addMarker(new MarkerOptions()
-                            .position(new LatLng(Latitude,Longitude))
-                            .title(userID)
-                            .snippet("nearby user")
-                            .icon(BitmapDescriptorFactory
-                                    .defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
-                    );
-                    marker2device.put(temp_Marker,device);
-                }
+                BleBasic.findDevices(2000);
+                Handler handler = new Handler();
+                final Runnable r = new Runnable(){
+                    public void run() {
+                        Log.d("BLE","mBleDevicesDict_size " + BleBasic.mBleDevicesDict.size());
+                        for (HashMap.Entry<BluetoothDevice, byte[]> entry : BleBasic.mBleDevicesDict.entrySet()) {
+                            BluetoothDevice device = entry.getKey();
+                            byte[] payload = entry.getValue();
+                            Double Latitude = AdvertisementPayload.parse_scan_payload(payload).getLatitude();
+                            Double Longitude = AdvertisementPayload.parse_scan_payload(payload).getLongitude();
+                            String userID = AdvertisementPayload.parse_scan_payload(payload).getProvider();
+                            Marker temp_Marker;
+                            temp_Marker = mMap.addMarker(new MarkerOptions()
+                                    .position(new LatLng(Latitude,Longitude))
+                                    .title(userID)
+                                    .snippet("nearby user")
+                                    .icon(BitmapDescriptorFactory
+                                            .defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
+                            );
+                            marker2device.put(temp_Marker,device);
+                        }
+                    }
+                };
+                handler.postDelayed(r, 2000);
             }
         });
 
@@ -272,7 +279,7 @@ public class mapsFragment extends Fragment implements OnMapReadyCallback  {
                 NavigationView navigationView = (NavigationView) getActivity().findViewById(R.id.nav_view);
                 navigationView.setCheckedItem(R.id.nav_chat);
                 ft.commit();
-                Log.d("DDDD", marker2device.get(marker).getAddress());
+                Log.d("MarkerTitleClick", "selected marker addr.: " + marker2device.get(marker).getAddress());
             }
         });
     }

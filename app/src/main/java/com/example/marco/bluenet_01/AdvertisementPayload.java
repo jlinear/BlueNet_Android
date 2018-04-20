@@ -23,6 +23,7 @@ public class AdvertisementPayload {
 
         byte[] byte_latitude = toByteArray(location.getLatitude());
         byte[] byte_longitude = toByteArray(location.getLongitude());
+
         byte[] byte_userID = UserID.getBytes(StandardCharsets.UTF_8);
 
         // concat more fields when necessary

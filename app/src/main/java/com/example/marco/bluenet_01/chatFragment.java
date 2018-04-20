@@ -1,10 +1,14 @@
 package com.example.marco.bluenet_01;
 
 import android.bluetooth.BluetoothDevice;
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -12,7 +16,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.UUID;
+
+import co.intentservice.chatui.ChatView;
+import co.intentservice.chatui.models.ChatMessage;
+
+import static android.content.Context.BIND_AUTO_CREATE;
 
 
 /**
@@ -33,11 +44,20 @@ public class chatFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    private CentralService mCentral = new CentralService();
+
+    ChatView chatView;
+    private CentralService mCentral;// = new CentralService();
 
     private OnFragmentInteractionListener mListener;
     TextView headerText;
     String headerTextString;
+    BluetoothDevice mDevice;
+    private boolean mShouldUnbind;
+
+    private static final UUID MSG_SERVICE_UUID = UUID
+            .fromString("00001869-0000-1000-8000-00805f9b34fb");
+    private static final UUID MSG_CHAR_UUID = UUID.
+            fromString("00002a69-0000-1000-8000-00805f9b34fb");
 
     public chatFragment() {
         // Required empty public constructor
@@ -61,6 +81,37 @@ public class chatFragment extends Fragment {
         return fragment;
     }
 
+    /***Gatt related stuff here**/
+    // Code to manage Service lifecycle.
+    private final ServiceConnection mServiceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+            mCentral = ((CentralService.LocalBinder) iBinder).getService();
+            if(!mCentral.initialize()){
+                Log.e("FATAL_ERR", "unable to initialize BLE");
+                getActivity().finish();
+            }
+            Log.d("chatFrag","service connected ");
+            Bundle bundle = getArguments();
+            mDevice = bundle.getParcelable("device");
+            mCentral.connect(mDevice);
+            Log.d("chatFrag",mCentral.getSupportedGattServices().toString());
+              //      mCentral.getGattService(TEST_SERVICE_UUID).getCharacteristic(TEST_CHAR_UUID).getStringValue(0));
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+            mCentral = null;
+            Log.d("chatFrag","service disconnected ");
+        }
+    };
+
+
+
+
+
+
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,10 +119,38 @@ public class chatFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+//        Bundle bundle = this.getArguments();
+//        BluetoothDevice mDevice = bundle.getParcelable("device");
+        Intent CentralServiceIntent = new Intent(this.getActivity(), CentralService.class);
+        getActivity().bindService(CentralServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
 
-        Bundle bundle = this.getArguments();
-        BluetoothDevice mDevice = bundle.getParcelable("device");
-        mCentral.connect(mDevice);
+        mCentral = new CentralService();
+
+        //mCentral.getGattService(mCentral.MSG_SERVICE_UUID);
+
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+
+        Intent CentralServiceIntent = new Intent(this.getActivity(), CentralService.class);
+        getActivity().bindService(CentralServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
+        mCentral = new CentralService();
+    }
+
+    @Override
+    public void onPause(){
+        super.onPause();
+        mCentral = null;
+        getActivity().unbindService(mServiceConnection);
+    }
+
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
+        mCentral = null;
+        getActivity().unbindService(mServiceConnection);
     }
 
     @Override
@@ -93,6 +172,20 @@ public class chatFragment extends Fragment {
 
         headerText = view.findViewById(R.id.chat_header);
         checkBundle();
+
+        // Send message through bluenet and receive on device
+        chatView = view.findViewById(R.id.chat_view);
+        chatView.setOnSentMessageListener(new ChatView.OnSentMessageListener() {
+            @Override
+            public boolean sendMessage(ChatMessage chatMessage) {
+                // TODO: Jian, implement write below
+                //blueNetInterface.write(chattingWith, chatMessage.getMessage());
+                return true; // returns true when it should put message on screen, false if it shouldn't
+            }
+        });
+
+        // this is how you add messages to the screen
+        chatView.addMessage(new ChatMessage("new received message", System.currentTimeMillis(), ChatMessage.Type.RECEIVED));
 
         return view;
     }
@@ -144,4 +237,7 @@ public class chatFragment extends Fragment {
         // TODO: Update argument type and name
         void onFragmentInteraction(String title);
     }
+
+
+
 }

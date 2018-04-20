@@ -46,6 +46,8 @@
             android:name=".navigationActivity"
             android:label="@string/title_activity_navigation"
             android:theme="@style/AppTheme"></activity>
+        <service android:name=".CentralService"/>
+        <service android:name=".PeripheralService"/>
     </application>
 
 </manifest>

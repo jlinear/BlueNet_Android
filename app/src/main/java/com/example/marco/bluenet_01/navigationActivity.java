@@ -228,7 +228,7 @@ public class navigationActivity extends AppCompatActivity
                             // Got last known location. In some rare situations this can be null.
                             if (location != null) {
                                 AdvertisementPayload outPayload = new AdvertisementPayload();
-                                outPayload.setUserID(getIntent().getStringExtra("userName"));
+                                outPayload.setUserID(PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("userName", ""));//(getIntent().getStringExtra("userName"));
                                 outPayload.setLocation(location);
                                 byte[] out = outPayload.getPayload();
                                 BleBasic.startLeAdvertising(out);
