@@ -10,6 +10,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import java.sql.Time;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import co.intentservice.chatui.ChatView;
@@ -97,20 +100,17 @@ public class chatFragment extends Fragment {
         chatView.setOnSentMessageListener(new ChatView.OnSentMessageListener() {
             @Override
             public boolean sendMessage(ChatMessage chatMessage) {
-                blueNetInterface.write(chattingWith, chatMessage.getMessage());
-                return true;
+                // TODO: Jian, implement write below
+                //blueNetInterface.write(chattingWith, chatMessage.getMessage());
+                return true; // returns true when it should put message on screen, false if it shouldn't
             }
         });
 
+        // this is how you add messages to the screen
+        chatView.addMessage(new ChatMessage("new received message", System.currentTimeMillis(), ChatMessage.Type.RECEIVED));
+
         return view;
     }
-
-    // TODO: Rename method, update argument and hook method into UI event
-    /*public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
-    }*/
 
     @Override
     public void onAttach(Context context) {

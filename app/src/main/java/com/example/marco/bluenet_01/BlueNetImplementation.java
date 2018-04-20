@@ -1,6 +1,7 @@
 package com.example.marco.bluenet_01;
 
 import android.location.Location;
+import android.net.wifi.p2p.WifiP2pManager;
 
 /**
  * Created by marco on 4/9/2018.
@@ -14,12 +15,17 @@ public class BlueNetImplementation implements BlueNetInterface {
     }
 
     @Override
-    public int write(String input) {
+    public int write(String username, String input) {
         return 0;
     }
 
     @Override
     public void regCallback(Runnable functionPointer) {
+
+    }
+
+    @Override
+    public void onReceivedMessageListener() {
 
     }
 

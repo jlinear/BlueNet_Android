@@ -80,7 +80,7 @@
     <ImageView
         android:layout_width="130dp"
         android:layout_height="130dp"
-        android:src="@drawable/bluenet_icon"
+        android:src="@mipmap/bluenet_icon"
         android:scaleType="fitCenter"
         android:layout_gravity="center"/>
 
