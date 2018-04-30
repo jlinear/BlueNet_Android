@@ -14,10 +14,16 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.InputType;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class navigationActivity extends AppCompatActivity
         implements
@@ -129,4 +135,30 @@ public class navigationActivity extends AppCompatActivity
         getSupportActionBar().setTitle(title);
     }
 
+    public void distressClick(View view) {
+        final EditText editText = new EditText(this);
+        new AlertDialog.Builder(this)
+                .setTitle("Send Distress Signal?")
+                .setMessage("Please enter your distress message:")
+                .setView(editText)
+                .setPositiveButton("Send", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        // TODO: send the distress signal with BlueNet
+                        // use this to get text from prompt: editText.getText();
+                        showToast("Distress signal sent!");
+                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                        drawer.closeDrawer(GravityCompat.START);
+                        // hide keyboard
+                        ((InputMethodManager) getSystemService(navigationActivity.INPUT_METHOD_SERVICE))
+                                .toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, 0);
+                    }
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+
+    private void showToast(String s){
+        Toast.makeText(this, s, Toast.LENGTH_SHORT).show();
+    }
 }
